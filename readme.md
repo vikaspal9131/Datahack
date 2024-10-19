@@ -43,7 +43,7 @@ cd paleto-bay-mlops-pipeline
 pip install -r requirements.txt
 Run the Pipeline:
 bash
-Copy code
+Copy code   
 airflow standalone
 
 
