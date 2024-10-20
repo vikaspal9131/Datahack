@@ -4,17 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.stattools import adfuller
-from zenml.steps import step, Output
+from zenml.steps import step
 
-@step
-def train_model(data: pd.DataFrame) -> Output(predictions=pd.DataFrame):
+def train_model(data: pd.DataFrame) -> pd.DataFrame:
     """Train an ARIMA model and return predictions.
 
     Args:
         data (pd.DataFrame): Preprocessed sales data.
 
     Returns:
-        Output: DataFrame containing actual and predicted sales.
+        pd.DataFrame: DataFrame containing actual and predicted sales.
     """
     # Set date as index
     data.set_index('Date', inplace=True)
@@ -51,3 +50,6 @@ def train_model(data: pd.DataFrame) -> Output(predictions=pd.DataFrame):
     plt.show()
 
     return test[['Order_Total', 'Predicted']]
+
+# Wrap the function with the ZenML step decorator
+train_model = step(train_model)
