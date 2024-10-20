@@ -1,62 +1,88 @@
 # Import necessary libraries
 import pandas as pd
+from textblob import TextBlob
 import matplotlib.pyplot as plt
 
 # Load the datasets
 food_feedback = pd.read_csv('../Raw/food_feedback_dump.csv')
 service_feedback = pd.read_csv('../Raw/service_feedback_dump.csv')
 
-# Merge feedback data into a single DataFrame for analysis (assuming both datasets have similar structures)
+# Merge feedback data into a single DataFrame for analysis
 feedback_data = pd.concat([food_feedback, service_feedback], ignore_index=True)
 
-# Assuming the dataset has a 'Rating' column for analysis
-# Example ratings are integers ranging from 1 to 10 for the sake of NPS calculation
-# For CSAT, let's assume ratings between 1 to 5 (adjust according to your data)
+# Display first few rows to understand the data structure
+print(feedback_data.head())
 
-### Step 2: Calculate Net Promoter Score (NPS)
+### Step 1: Customer Satisfaction Score (CSAT)
 
-def calculate_nps(ratings):
-    promoters = len(ratings[ratings >= 9])  # Ratings 9-10
-    passives = len(ratings[(ratings >= 7) & (ratings <= 8)])  # Ratings 7-8
-    detractors = len(ratings[ratings <= 6])  # Ratings 0-6
-    total_responses = len(ratings)
+# We will use the feedback answer fields (assuming they contain textual responses from customers)
+# Filter responses that indicate customer satisfaction based on positive keywords
 
-    nps = ((promoters - detractors) / total_responses) * 100
-    return nps
-
-# Apply NPS Calculation (assuming a 'Rating' column exists)
-feedback_data['Rating'] = feedback_data['Rating'].fillna(0)  # Fill missing values if any
-nps_score = calculate_nps(feedback_data['Rating'])
-print(f"Net Promoter Score (NPS): {nps_score}")
-
-### Step 3: Calculate Customer Satisfaction Score (CSAT)
-
-# Define CSAT calculation - assuming ratings 4-5 indicate satisfied customers
-def calculate_csat(ratings):
-    satisfied_customers = len(ratings[ratings >= 4])  # Ratings 4-5 indicate satisfied
-    total_responses = len(ratings)
-    csat = (satisfied_customers / total_responses) * 100
+def calculate_csat(feedback_column):
+    positive_responses = feedback_column.str.contains('good|excellent|great|satisfied|happy', case=False, na=False).sum()
+    total_responses = len(feedback_column)
+    csat = (positive_responses / total_responses) * 100
     return csat
 
-csat_score = calculate_csat(feedback_data['Rating'])
-print(f"Customer Satisfaction Score (CSAT): {csat_score}%")
+# Calculate CSAT for food and service feedback separately
+csat_score_food = calculate_csat(feedback_data['Answer_ff'])
+csat_score_service = calculate_csat(feedback_data['Answer_sf'])
 
-### Step 4: Calculate Average Rating
+print(f"Customer Satisfaction Score (CSAT) for Food: {csat_score_food}%")
+print(f"Customer Satisfaction Score (CSAT) for Service: {csat_score_service}%")
 
-average_rating = feedback_data['Rating'].mean()
-print(f"Average Rating: {average_rating:.2f}")
+### Step 2: Sentiment Analysis on Customer Feedback
 
-### Step 5: Visualize the Results
+# Perform sentiment analysis using TextBlob to understand overall customer sentiment
+def analyze_sentiment(text):
+    analysis = TextBlob(str(text))
+    return analysis.sentiment.polarity  # Polarity ranges from -1 (negative) to 1 (positive)
 
-# Plot NPS, CSAT, and Average Rating for better insight
-metrics = ['NPS', 'CSAT', 'Average Rating']
-values = [nps_score, csat_score, average_rating]
+# Apply sentiment analysis on both food and service feedback columns
+feedback_data['Sentiment_Score_Food'] = feedback_data['Answer_ff'].apply(analyze_sentiment)
+feedback_data['Sentiment_Score_Service'] = feedback_data['Answer_sf'].apply(analyze_sentiment)
 
-plt.figure(figsize=(10, 6))
-plt.bar(metrics, values, color=['#4CAF50', '#2196F3', '#FF9800'])
-plt.title('Customer Feedback Performance Metrics', fontsize=14)
-plt.xlabel('Metrics', fontsize=12)
-plt.ylabel('Values', fontsize=12)
-for index, value in enumerate(values):
-    plt.text(index, value + 0.5, f'{value:.2f}', ha='center', fontsize=12)
+# Classify the sentiment as positive, negative, or neutral for both food and service feedback
+feedback_data['Sentiment_Label_Food'] = feedback_data['Sentiment_Score_Food'].apply(lambda x: 'Positive' if x > 0 else ('Negative' if x < 0 else 'Neutral'))
+feedback_data['Sentiment_Label_Service'] = feedback_data['Sentiment_Score_Service'].apply(lambda x: 'Positive' if x > 0 else ('Negative' if x < 0 else 'Neutral'))
+
+# Display sentiment distribution
+sentiment_counts_food = feedback_data['Sentiment_Label_Food'].value_counts()
+sentiment_counts_service = feedback_data['Sentiment_Label_Service'].value_counts()
+
+print("\nSentiment Distribution for Food Feedback:")
+print(sentiment_counts_food)
+
+print("\nSentiment Distribution for Service Feedback:")
+print(sentiment_counts_service)
+
+### Step 3: Visualization of Sentiment Analysis
+
+# Plot the distribution of sentiment labels for food feedback
+plt.figure(figsize=(8, 5))
+sentiment_counts_food.plot(kind='bar', color=['#4CAF50', '#F44336', '#FFC107'])
+plt.title('Customer Feedback Sentiment Analysis for Food', fontsize=14)
+plt.xlabel('Sentiment', fontsize=12)
+plt.ylabel('Number of Responses', fontsize=12)
+plt.xticks(rotation=0)
+plt.show()
+
+# Plot the distribution of sentiment labels for service feedback
+plt.figure(figsize=(8, 5))
+sentiment_counts_service.plot(kind='bar', color=['#4CAF50', '#F44336', '#FFC107'])
+plt.title('Customer Feedback Sentiment Analysis for Service', fontsize=14)
+plt.xlabel('Sentiment', fontsize=12)
+plt.ylabel('Number of Responses', fontsize=12)
+plt.xticks(rotation=0)
+plt.show()
+
+### Step 4: Visualize CSAT Score
+
+# Plot the CSAT Scores for food and service feedback
+plt.figure(figsize=(6, 4))
+plt.bar(['Food CSAT Score', 'Service CSAT Score'], [csat_score_food, csat_score_service], color=['#2196F3', '#FF9800'])
+plt.title('Customer Satisfaction Score (CSAT)', fontsize=14)
+plt.ylim(0, 100)
+for i, score in enumerate([csat_score_food, csat_score_service]):
+    plt.text(i, score + 2, f'{score:.2f}%', ha='center', fontsize=12)
 plt.show()
