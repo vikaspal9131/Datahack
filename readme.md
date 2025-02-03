@@ -3,23 +3,34 @@ Design and develop an MLOps pipeline to handle raw sales and inventory data from
 
 
 Key Features:
+
 Automated Data Ingestion and Transformation
 
-Automate ETL using Apache Airflow or AWS Glue.
-Normalize varied data structures for unified analysis.
-Store data in AWS S3 or Google Cloud Storage.
-Intelligent Issue Detection & Recommendations
+Streamline ETL (Extract, Transform, Load) processes using tools like Apache Airflow or AWS Glue.
 
-Detect anomalies (e.g., suspicious transactions, theft) using models like Isolation Forests.
-Provide a rating system (1-5 or color-coded) to flag severity.
-Visualize insights with Dash or Tableau.
+Normalize diverse data structures into a unified format for consistent analysis.
+
+Store processed data in scalable cloud storage solutions such as AWS S3 or Google Cloud Storage.
+
+Intelligent Issue Detection and Recommendations
+
+Detect anomalies (e.g., suspicious transactions, inventory theft) using advanced machine learning models like Isolation Forests.
+
+Implement a severity rating system (e.g., 1-5 scale or color-coded alerts) to prioritize issues.
+
+Visualize insights and anomalies through interactive dashboards using tools like Dash or Tableau.
+
 Multi-Calendar Predictions
 
-Implement time-series models (Prophet, ARIMA) for diverse calendars.
-Customize forecasts for specific restaurant timelines and holidays.
+Leverage time-series forecasting models such as Prophet or ARIMA to accommodate diverse calendar systems (e.g., fiscal, lunar, or regional calendars).
+
+Customize predictions to align with specific restaurant timelines, seasonal trends, and holidays.
+
 Continuous Feedback Loop
 
-Collect user feedback on suggestions to improve models via reinforcement learning.
+Collect user feedback on system-generated recommendations to refine and improve models.
+
+Incorporate reinforcement learning techniques to iteratively enhance model accuracy and relevance.
 Bonus Features:
 Analyze historical data for trends and predictions using advanced time-series models.
 Use NLP for prompt-based dashboards via Power BI or Looker.
