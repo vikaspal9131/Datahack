@@ -41,8 +41,9 @@ cd paleto-bay-mlops-pipeline
 pip install -r requirements.txt
 Run the Pipeline:
 bash
-Copy code   
-airflow standalone
+
+
+
 
 
 For production: Deploy with Kubernetes and cloud configuration.
