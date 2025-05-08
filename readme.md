@@ -1,4 +1,5 @@
 Objective(Intro): 
+update 
 the repo about data 
 Design and develop an MLOps pipeline to handle raw sales and inventory data from independent restaurants and provide actionable insights, problem identification, and suggestions, design and create an MLOps pipeline. A scalable and adaptable pipeline is necessary because every restaurant has different data structures.
 
